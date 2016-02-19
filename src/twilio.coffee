@@ -39,11 +39,13 @@ class Twilio extends Adapter
 
   send: (envelope, strings...) ->
     message = strings.join "\n"
-    @send_sms message, envelope.user.id, (err, body) ->
-      if err or not body?
-        console.log "Error sending reply SMS: #{err}"
-      else
-        console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
+    message_chunks = @chunk_for_sms message
+    for chunk in message_chunks ->
+      @send_sms chunk, envelope.user.id, (err, body) ->
+        if err or not body?
+          console.log "Error sending reply SMS: #{err}"
+        else
+          console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
 
   reply: (envelope, strings...) ->
     @send envelope, str for str in strings
@@ -53,6 +55,9 @@ class Twilio extends Adapter
     user = new User from
     message = new TextMessage user, body
     @robot.receive message
+
+  chunk_for_sms: (message) ->
+    message.match(/^(\r\n|.){1,160}\b/g).join('')
 
   send_sms: (message, to, callback) ->
     auth = new Buffer(@options.sid + ':' + @options.token).toString("base64")
@@ -64,7 +69,6 @@ class Twilio extends Adapter
       .header("Content-Type", "application/x-www-form-urlencoded")
       .post(data) (err, res, body) ->
         console.log(err)
-        console.log(res)
         console.log(body)
         if err
           callback err
