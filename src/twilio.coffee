@@ -37,12 +37,6 @@ class Twilio extends Adapter
       response.writeHead 200, 'Content-Type': 'text/plain'
       response.end()
 
-  receive_sms: (body, from) ->
-    return if body.length is 0
-    user = new User from
-    message = new TextMessage user, body
-    @robot.receive message
-
   send: (envelope, strings...) ->
     message = strings.join "\n"
     @send_sms message, envelope.user.id, (err, body) ->
@@ -50,6 +44,15 @@ class Twilio extends Adapter
         return @robot.logger.error "Error sending reply SMS: #{err}"
       else
         @robot.logger.info "Sending reply SMS: #{message} to #{envelope.user.id}"
+
+  reply: (envelope, strings...) ->
+    @send user, str for str in strings
+
+  receive_sms: (body, from) ->
+    return if body.length is 0
+    user = new User from
+    message = new TextMessage user, body
+    @robot.receive message
 
   send_sms: (message, to, callback) ->
     auth = new Buffer(@options.sid + ':' + @options.token).toString("base64")
