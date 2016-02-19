@@ -63,6 +63,9 @@ class Twilio extends Adapter
       .header("Authorization", "Basic #{auth}")
       .header("Content-Type", "application/x-www-form-urlencoded")
       .post(data) (err, res, body) ->
+        console.log(err)
+        console.log(res)
+        console.log(body)
         if err
           callback err
         else if res.statusCode is 201
