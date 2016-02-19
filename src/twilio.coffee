@@ -1,5 +1,5 @@
 
-{ Robot, Adapter, TextMessage } = require("hubot")
+{Robot, Adapter, TextMessage } = require 'hubot'
 
 QS = require "querystring"
 
@@ -40,7 +40,7 @@ class Twilio extends Adapter
   receive_sms: (body, from) ->
     return if body.length is 0
     user = @robot.userForId from
-    
+
     @receive new Robot.TextMessage user, body
 
   send_sms: (message, to, callback) ->
