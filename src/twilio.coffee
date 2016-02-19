@@ -1,37 +1,37 @@
 
-{Robot, Adapter, TextMessage } = require 'hubot'
+{Robot, Adapter, TextMessage} = require 'hubot'
 
 QS = require "querystring"
 
 class Twilio extends Adapter
 
   constructor: (robot) ->
+    @robot = robot
     @sid   = process.env.HUBOT_SMS_SID
     @token = process.env.HUBOT_SMS_TOKEN
     @from  = process.env.HUBOT_SMS_FROM
-    @robot = robot
-    super robot
-
-  send: (user, strings...) ->
-    message = strings.join "\n"
-    @send_sms message, user.id, (err, body) ->
-      if err or not body?
-        console.log "Error sending reply SMS: #{err}"
-      else
-        console.log "Sending reply SMS: #{message} to #{user.id}"
-
-  reply: (user, strings...) ->
-    @send user, str for str in strings
-
-  respond: (regex, callback) ->
-    @hear regex, callback
 
   run: ->
+
+    options =
+      sid: process.env.HUBOT_SMS_SID
+      token: process.env.HUBOT_SMS_TOKEN
+      from: process.env.HUBOT_SMS_FROM
+
+    return @robot.logger.error "No Twilio SID provided to Hubot" unless options.sid
+    return @robot.logger.error "No Twilio token provided to Hubot" unless options.token
+    return @robot.logger.error "No Twilio from number provided to Hubot" unless options.from
+
+    @options = options
+
+    @robot.logger.info "Run"
+    @emit "connected"
+
     @robot.router.get "/hubot/sms", (request, response) =>
       payload = QS.parse(request.url)
 
       if payload.Body? and payload.From?
-        console.log "Received SMS: #{payload.Body} from #{payload.From}"
+        @robot.logger.info "Received SMS: #{payload.Body} from #{payload.From}"
         @receive_sms(payload.Body, payload.From)
 
       response.writeHead 200, 'Content-Type': 'text/plain'
@@ -39,26 +39,32 @@ class Twilio extends Adapter
 
   receive_sms: (body, from) ->
     return if body.length is 0
-    user = @robot.brain.userForId() from
+    user = new User from
+    message = new TextMessage user, body
+    @robot.receive message
 
-    @receive new Robot.TextMessage user, body
+  send: (envelope, strings...) ->
+    message = strings.join "\n"
+    @send_sms message, envelope.user.id, (err, body) ->
+      if err or not body?
+        return @robot.logger.error "Error sending reply SMS: #{err}"
+      else
+        @robot.logger.info "Sending reply SMS: #{message} to #{envelope.user.id}"
 
   send_sms: (message, to, callback) ->
-    auth = new Buffer(@sid + ':' + @token).toString("base64")
-    data = QS.stringify From: @from, To: to, Body: message
+    auth = new Buffer(@options.sid + ':' + @options.token).toString("base64")
+    data = QS.stringify From: @options.from, To: to, Body: message
 
     @robot.http("https://api.twilio.com")
-      .path("/2010-04-01/Accounts/#{@sid}/SMS/Messages.json")
+      .path("/2010-04-01/Accounts/#{@options.sid}/SMS/Messages.json")
       .header("Authorization", "Basic #{auth}")
       .header("Content-Type", "application/x-www-form-urlencoded")
       .post(data) (err, res, body) ->
         if err
           callback err
         else if res.statusCode is 201
-          json = JSON.parse(body)
           callback null, body
         else
-          json = JSON.parse(body)
           callback body.message
 
 exports.use = (robot) ->
