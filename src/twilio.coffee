@@ -40,7 +40,7 @@ class Twilio extends Adapter
   send: (envelope, strings...) ->
     message = strings.join "\n"
     message_chunks = @chunk_for_sms message
-    for chunk in message_chunks ->
+    for chunk in message_chunks
       @send_sms chunk, envelope.user.id, (err, body) ->
         if err or not body?
           console.log "Error sending reply SMS: #{err}"
