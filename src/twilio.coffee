@@ -1,10 +1,10 @@
-Robot   = require("hubot").robot()
-Adapter = require("hubot").adapter()
 
-HTTP    = require "http"
-QS      = require "querystring"
+{ Robot, Adapter, TextMessage } = require("hubot")
+
+QS = require "querystring"
 
 class Twilio extends Adapter
+
   constructor: (robot) ->
     @sid   = process.env.HUBOT_SMS_SID
     @token = process.env.HUBOT_SMS_TOKEN
@@ -14,7 +14,6 @@ class Twilio extends Adapter
 
   send: (user, strings...) ->
     message = strings.join "\n"
-
     @send_sms message, user.id, (err, body) ->
       if err or not body?
         console.log "Error sending reply SMS: #{err}"
@@ -41,12 +40,7 @@ class Twilio extends Adapter
   receive_sms: (body, from) ->
     return if body.length is 0
     user = @robot.userForId from
-
-		# TODO Assign self.robot.name here instead of Nurph
-    #if body.match(/^Nurph\b/i) is null
-    #  console.log "I'm adding 'Nurph' as a prefix."
-    #  body = 'Nurph' + '' + body
-
+    
     @receive new Robot.TextMessage user, body
 
   send_sms: (message, to, callback) ->
