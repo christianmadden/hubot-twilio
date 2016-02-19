@@ -46,7 +46,7 @@ class Twilio extends Adapter
         @robot.logger.info "Sending reply SMS: #{message} to #{envelope.user.id}"
 
   reply: (envelope, strings...) ->
-    @send user, str for str in strings
+    @send envelope, str for str in strings
 
   receive_sms: (body, from) ->
     return if body.length is 0
