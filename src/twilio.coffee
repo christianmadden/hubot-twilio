@@ -1,5 +1,5 @@
 
-{Robot, Adapter, TextMessage} = require 'hubot'
+{Robot, Adapter, TextMessage, User} = require 'hubot'
 
 QS = require "querystring"
 
