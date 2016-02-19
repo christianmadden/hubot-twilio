@@ -41,9 +41,9 @@ class Twilio extends Adapter
     message = strings.join "\n"
     @send_sms message, envelope.user.id, (err, body) ->
       if err or not body?
-        return @robot.logger.error "Error sending reply SMS: #{err}"
+        console.log "Error sending reply SMS: #{err}"
       else
-        @robot.logger.info "Sending reply SMS: #{message} to #{envelope.user.id}"
+        console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
 
   reply: (envelope, strings...) ->
     @send envelope, str for str in strings
