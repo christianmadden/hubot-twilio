@@ -43,9 +43,9 @@ class Twilio extends Adapter
     user = @robot.userForId from
 
 		# TODO Assign self.robot.name here instead of Nurph
-    if body.match(/^Nurph\b/i) is null
-      console.log "I'm adding 'Nurph' as a prefix."
-      body = 'Nurph' + '' + body
+    #if body.match(/^Nurph\b/i) is null
+    #  console.log "I'm adding 'Nurph' as a prefix."
+    #  body = 'Nurph' + '' + body
 
     @receive new Robot.TextMessage user, body
 
