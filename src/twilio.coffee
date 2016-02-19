@@ -39,7 +39,7 @@ class Twilio extends Adapter
 
   receive_sms: (body, from) ->
     return if body.length is 0
-    user = @robot.userForId from
+    user = @robot.brain.userForId() from
 
     @receive new Robot.TextMessage user, body
 
