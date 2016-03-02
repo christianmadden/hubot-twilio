@@ -2,18 +2,14 @@
   "name":        "hubot-twilio",
   "version":     "2.2.1",
   "author":      "Christian Madden",
-  "keywords":    "github hubot twilio forked adapter",
+  "keywords":    "github hubot twilio adapter",
   "description": "A fork of the original Twilio adapter for hubot",
-  "licenses":     [{
-    "type":       "MIT",
-    "url":        "http://github.com/christianmadden/hubot-twilio/raw/master/LICENSE"
-  }],
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/christianmadden/hubot-twilio.git"
+  "private": true,
+  "peerDependencies": {
+    "hubot": ">=2.0"
   },
   "devDependencies": {
-    "coffee-script": "1.10.x"
+    "coffee-script": ">=1.2.0"
   },
   "main": "./src/twilio"
 }

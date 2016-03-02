@@ -1,18 +1,13 @@
 
-{Robot, Adapter, TextMessage, User} = require 'hubot'
-
+{ Robot, Adapter, TextMessage, User } = require 'hubot'
 QS = require "querystring"
 
 class Twilio extends Adapter
 
   constructor: (robot) ->
     @robot = robot
-    @sid   = process.env.HUBOT_SMS_SID
-    @token = process.env.HUBOT_SMS_TOKEN
-    @from  = process.env.HUBOT_SMS_FROM
 
   run: ->
-
     options =
       sid: process.env.HUBOT_SMS_SID
       token: process.env.HUBOT_SMS_TOKEN
@@ -29,7 +24,6 @@ class Twilio extends Adapter
 
     @robot.router.get "/hubot/sms", (request, response) =>
       payload = QS.parse(request.url)
-
       if payload.Body? and payload.From?
         @robot.logger.info "Received SMS: #{payload.Body} from #{payload.From}"
         @receive_sms(payload.Body, payload.From)
@@ -37,19 +31,21 @@ class Twilio extends Adapter
       response.writeHead 200, 'Content-Type': 'text/plain'
       response.end()
 
-  send: (envelope, strings...) ->
-    message = strings.join "\n"
-    @send_sms message, envelope.user.id, (err, body) ->
-      if err or not body?
-        console.log "Error sending reply SMS: #{err}"
-      else
-        console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
-
   receive_sms: (body, from) ->
     return if body.length is 0
     user = new User from
     message = new TextMessage user, body
+    @robot.logger.info"Receieved SMS: #{message} from #{user.id}"
     @robot.receive message
+
+  send: (envelope, strings...) ->
+    message = strings.join "\n"
+    @robot.logger.info "Sending reply SMS: #{message} to #{envelope.user.id}"
+    #@send_sms message, envelope.user.id, (err, body) ->
+    #  if err or not body?
+    #    console.log "Error sending reply SMS: #{err}"
+    #  else
+    #    console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
 
   send_sms: (message, to, callback) ->
     auth = new Buffer(@options.sid + ':' + @options.token).toString("base64")
