@@ -79,10 +79,10 @@ class Twilio extends Adapter
   split_string: (string, length) ->
     strings = []
     while(string.length > length)
-        var pos = string.substring(0, length).lastIndexOf(' ')
+        pos = string.substring(0, length).lastIndexOf(' ')
         pos = pos <= 0 ? length : pos
         strings.push(string.substring(0, pos))
-        var i = string.indexOf(' ', pos) + 1
+        i = string.indexOf(' ', pos) + 1
         if(i < pos || i > pos + length)
             i = pos
         string = string.substring(i)
