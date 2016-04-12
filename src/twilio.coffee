@@ -47,7 +47,7 @@ class Twilio extends Adapter
   send: (envelope, strings...) ->
     full_message = strings.join "\n"
     console.log "Sending reply SMS from #{@options.name}: #{full_message} to #{envelope.user.id}"
-    messages = split_string(full_message, 150)
+    messages = @split_string(full_message, 150)
     for message in messages
       # Stagger the messages by a second so they (hopefully) arrive in order
       setTimeout ->
