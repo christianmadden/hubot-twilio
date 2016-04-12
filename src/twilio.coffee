@@ -45,13 +45,18 @@ class Twilio extends Adapter
 
   # Bot has requested an outbound message to be sent
   send: (envelope, strings...) ->
-    message = strings.join "\n"
-    console.log "Sending reply SMS from #{@options.name}: #{message} to #{envelope.user.id}"
-    @send_sms message, envelope.user.id, (err, body) ->
-      if err or not body?
-        console.log "Error sending reply SMS: #{err}"
-      else
-        console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
+    full_message = strings.join "\n"
+    console.log "Sending reply SMS from #{@options.name}: #{full_message} to #{envelope.user.id}"
+    messages = split_string(full_message, 150)
+    for message in messages
+      # Stagger the messages by a second so they (hopefully) arrive in order
+      setTimeout ->
+        @send_sms message, envelope.user.id, (err, body) ->
+          if err or not body?
+            console.log "Error sending reply SMS: #{err}"
+          else
+            console.log "Sending reply SMS: #{message} to #{envelope.user.id}"
+      , 1000
 
   # Because SMS doesn't have multiple users like chat, a reply is the same as a send
   reply: (envelope, strings...) -> @send envelope, strings...
@@ -64,16 +69,27 @@ class Twilio extends Adapter
       .header("Authorization", "Basic #{auth}")
       .header("Content-Type", "application/x-www-form-urlencoded")
       .post(data) (err, res, body) ->
-        console.log err
-        console.log res.statusCode
-        console.log res
-        console.log body
         if err
           callback err
         else if res.statusCode is 201
           callback null, body
         else
           callback body.message
+
+  split_string: (string, l) ->
+    strings = []
+    while(string.length > l)
+        var pos = string.substring(0, l).lastIndexOf(' ')
+        pos = pos <= 0 ? l : pos
+        strings.push(string.substring(0, pos))
+        var i = string.indexOf(' ', pos) + 1
+        if(i < pos || i > pos+l)
+            i = pos
+        string = string.substring(i)
+    }
+    strings.push(string)
+    return strings
+}
 
 exports.use = (robot) ->
   new Twilio robot
