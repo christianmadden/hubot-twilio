@@ -76,14 +76,14 @@ class Twilio extends Adapter
         else
           callback body.message
 
-  split_string: (string, l) ->
+  split_string: (string, length) ->
     strings = []
-    while(string.length > l)
-        var pos = string.substring(0, l).lastIndexOf(' ')
-        pos = pos <= 0 ? l : pos
+    while(string.length > length)
+        var pos = string.substring(0, length).lastIndexOf(' ')
+        pos = pos <= 0 ? length : pos
         strings.push(string.substring(0, pos))
         var i = string.indexOf(' ', pos) + 1
-        if(i < pos || i > pos+l)
+        if(i < pos || i > pos + length)
             i = pos
         string = string.substring(i)
     }
