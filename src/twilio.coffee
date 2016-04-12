@@ -79,17 +79,15 @@ class Twilio extends Adapter
   split_string: (string, length) ->
     strings = []
     while(string.length > length)
-        pos = string.substring(0, length).lastIndexOf(' ')
-        pos = pos <= 0 ? length : pos
-        strings.push(string.substring(0, pos))
-        i = string.indexOf(' ', pos) + 1
-        if(i < pos || i > pos + length)
-            i = pos
-        string = string.substring(i)
-    }
+      pos = string.substring(0, length).lastIndexOf(' ')
+      pos = pos <= 0 ? length : pos
+      strings.push(string.substring(0, pos))
+      i = string.indexOf(' ', pos) + 1
+      if(i < pos || i > pos + length)
+        i = pos
+      string = string.substring(i)
     strings.push(string)
     return strings
-}
 
 exports.use = (robot) ->
   new Twilio robot
