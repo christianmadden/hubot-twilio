@@ -44,14 +44,14 @@ class Twilio extends Adapter
     @robot.receive message
 
   # Bot has requested an outbound message to be sent
-  send: (envelope, strings...) ->
+  send: (envelope, strings...) =>
     full_message = strings.join "\n"
     console.log "Sending reply SMS from #{@options.name}: #{full_message} to #{envelope.user.id}"
     messages = @split_string(full_message, 150)
     for message in messages
       # Stagger the messages by a second so they (hopefully) arrive in order
-      setTimeout ->
-        @send_sms message, envelope.user.id, (err, body) ->
+      setTimeout =>
+        @send_sms message, envelope.user.id, (err, body) =>
           if err or not body?
             console.log "Error sending reply SMS: #{err}"
           else
